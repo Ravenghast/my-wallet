@@ -1,0 +1,71 @@
+apply plugin: 'java'
+
+group 'org.retail'
+version '1.0'
+
+defaultTasks 'clean', 'test', 'jacocoTestReport', 'jar', 'copyArtifacts'
+
+def buildLib = "${buildDir}/libs"
+def delv = "delivery"
+def lib = "${delv}/lib"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.springframework.boot:spring-boot-starter-web:2.5.8'
+    compile 'io.springfox:springfox-swagger2:2.9.2'
+    compile 'io.springfox:springfox-swagger-ui:2.9.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
+    testImplementation 'org.mockito:mockito-inline:4.8.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:4.8.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
+    jar {
+        manifest {
+            attributes (
+                    'Main-Class': 'com.retail.WalletApplication',
+                    'Class-Path': configurations.compile.collect { it.getName() }.join(' ')
+            )
+        }
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
+
+apply plugin: 'jacoco'
+
+jacoco {
+    toolVersion = "0.8.8"
+    reportsDir = file("$buildDir/jacoco")
+}
+
+jacocoTestReport {
+    dependsOn(test)
+
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    "com/retail/*Application.*"
+            ])
+        }))
+    }
+}
+
+task copyArtifacts {
+    copy {
+        from(sourceSets.main.runtimeClasspath.findAll {it.name.endsWith('.jar') })
+        into(lib)
+    }
+    copy {
+        from "${buildLib}/${rootProject.name}-${version}.jar"
+        into(lib)
+    }
+    copy {
+        from "${rootDir}/RunWallet.bat"
+        into(delv)
+    }
+}
+
