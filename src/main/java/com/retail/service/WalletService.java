@@ -1,24 +1,29 @@
 package com.retail.service;
 
-import org.springframework.context.annotation.Configuration;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-@Configuration
+@Service
+@Slf4j
 public class WalletService implements IWalletService {
 
-    private final HashMap<Integer, Integer> wallet = new HashMap<>();
-    private final List<Integer> denominations  = new ArrayList<>();
+    private final @Getter HashMap<Integer, Integer> wallet = new HashMap<>();
+    private final @Getter List<Integer> denominations  = new ArrayList<>();
 
     @Override
     public void initialiseWallet(List<Integer> list) {
         if (list == null) {
+            log.error("wallet is null");
             throw new IllegalArgumentException("Invalid wallet");
         }
         wallet.clear();
         denominations.clear();
         for (int note : list) {
             if (note <= 0) {
+                log.error("invalid denomination "+note);
                 throw new IllegalArgumentException("Invalid denomination: " + note);
             }
             wallet.merge(note, 1, Integer::sum);
@@ -30,6 +35,7 @@ public class WalletService implements IWalletService {
     @Override
     public List<Integer> getNotes(int amount) {
         if (amount <= 0) {
+            log.error("invalid amount "+ amount);
             throw new IllegalArgumentException("Invalid amount: "+amount);
         }
         List<Integer> txn = new ArrayList<>();
@@ -39,8 +45,10 @@ public class WalletService implements IWalletService {
             }
         }
         if (amount > 0) {
+            log.error("Amount does not match exact wallet");
             txn.clear();
         }
+        log.info("Returning notes: "+txn);
         return txn;
     }
 
@@ -54,14 +62,6 @@ public class WalletService implements IWalletService {
             }
         }
         return value;
-    }
-
-    public HashMap<Integer, Integer> getWallet() {
-        return wallet;
-    }
-
-    public List<Integer> getDenominations() {
-        return denominations;
     }
 
 }
