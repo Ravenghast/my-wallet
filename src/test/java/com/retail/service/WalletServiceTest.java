@@ -1,4 +1,4 @@
-package com.retail;
+package com.retail.service;
 
 import org.junit.jupiter.api.Test;
 
@@ -6,9 +6,9 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class WalletManagerTest {
+public class WalletServiceTest {
 
-    private WalletManager mgr = new WalletManager();
+    private final WalletService mgr = new WalletService();
 
     @Test
     public void testInitialiseWallet() {

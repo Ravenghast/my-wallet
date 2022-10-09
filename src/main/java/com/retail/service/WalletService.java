@@ -1,11 +1,11 @@
-package com.retail;
+package com.retail.service;
 
 import org.springframework.context.annotation.Configuration;
 
 import java.util.*;
 
 @Configuration
-public class WalletManager implements IWalletManager {
+public class WalletService implements IWalletService {
 
     private final HashMap<Integer, Integer> wallet = new HashMap<>();
     private final List<Integer> denominations  = new ArrayList<>();

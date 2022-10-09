@@ -15,7 +15,7 @@ The JUnit reports along with Code Coverage are available at:
 ## 3. Run the app
 1. Go to the folder: *<project_folder>*\delivery
 2. Run the batch file: **RunWallet.bat**
-   <p>The app is up & running now, ready to recieve REST requests in the default port 8080</p>
+   <p>The app is up & running now, ready to receive REST requests in the default port 8080</p>
 
 ## 4. Test the app using Swagger
 1. In a browser, open the link [here](http://localhost:8080/swagger-ui.html)
