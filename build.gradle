@@ -6,8 +6,8 @@ version '1.0'
 defaultTasks 'clean', 'test', 'jacocoTestReport', 'jar', 'copyArtifacts'
 
 def buildLib = "${buildDir}/libs"
-def delv = "delivery"
-def lib = "${delv}/lib"
+def tgt = "delivery"
+def lib = "${tgt}/lib"
 
 repositories {
     mavenCentral()
@@ -55,17 +55,22 @@ jacocoTestReport {
 }
 
 task copyArtifacts {
-    copy {
-        from(sourceSets.main.runtimeClasspath.findAll {it.name.endsWith('.jar') })
-        into(lib)
-    }
-    copy {
-        from "${buildLib}/${rootProject.name}-${version}.jar"
-        into(lib)
-    }
-    copy {
-        from "${rootDir}/RunWallet.bat"
-        into(delv)
+    doLast {
+        copy {
+            from(sourceSets.main.runtimeClasspath.findAll { it.name.endsWith('.jar') })
+            into(lib)
+        }
+        copy {
+            from "${buildLib}/${rootProject.name}-${version}.jar"
+            into(lib)
+        }
+        copy {
+            from "${rootDir}/RunWallet.bat"
+            into(tgt)
+        }
     }
 }
 
+clean {
+    delete tgt
+}

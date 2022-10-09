@@ -38,7 +38,7 @@ public class WalletService implements IWalletService {
                 amount = extractAmount(amount, note, txn);
             }
         }
-        if (amount != 0) {
+        if (amount > 0) {
             txn.clear();
         }
         return txn;
@@ -46,7 +46,7 @@ public class WalletService implements IWalletService {
 
     private int extractAmount(int value, int note, List<Integer> txn) {
         int count = wallet.get(note);
-        for (int j=0;j<count;j++) {
+        while (count-- > 0) {
             txn.add(note);
             value -= note;
             if (note > value) {
