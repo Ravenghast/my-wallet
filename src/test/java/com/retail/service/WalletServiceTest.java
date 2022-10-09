@@ -3,6 +3,7 @@ package com.retail.service;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -78,11 +79,7 @@ public class WalletServiceTest {
     }
 
     private List<Integer> convertToList(int[] n) {
-        List<Integer> list = new ArrayList<>();
-        for (int i : n) {
-            list.add(i);
-        }
-        return list;
+        return Arrays.stream(n).boxed().collect(Collectors.toList());
     }
 
 }
