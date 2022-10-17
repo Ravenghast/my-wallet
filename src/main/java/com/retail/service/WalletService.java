@@ -1,6 +1,5 @@
 package com.retail.service;
 
-import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -12,6 +11,7 @@ import java.util.*;
 public class WalletService implements IWalletService {
 
     private final @Getter HashMap<Integer, Integer> wallet = new HashMap<>();
+    private int[] keys = new int[0];
     private final List<Integer> txn = new ArrayList<>();
     private int amount;
 
@@ -29,6 +29,7 @@ public class WalletService implements IWalletService {
             }
             wallet.merge(note, 1, Integer::sum);
         }
+        keys = wallet.keySet().stream().mapToInt(Integer::intValue).toArray();
     }
 
     @Override
@@ -37,8 +38,8 @@ public class WalletService implements IWalletService {
             log.error("invalid amount "+ amount);
             throw new IllegalArgumentException("Invalid amount: "+amount);
         }
-        for (int i = 1; i <= wallet.keySet().size(); i++) {
-            List<List<Integer>> comboList = generateCombinations(i);
+        for (int i = 1; i <= keys.length; i++) {
+            List<List<Integer>> comboList = getCombinations(i);
             verifyCombination(comboList, txnAmount);
             if (amount == 0) {
                 break;
@@ -52,14 +53,10 @@ public class WalletService implements IWalletService {
         return txn;
     }
 
-    private List<List<Integer>> generateCombinations(int n) {
-        Set<Set<Integer>> combinations = Sets.combinations(wallet.keySet(), n);
+    private List<List<Integer>> getCombinations(int size) {
+        int[] combos=new int[size];
         List<List<Integer>> comboList = new ArrayList<>();
-        combinations.forEach(set -> {
-            List<Integer> list = new ArrayList<>(set);
-            list.sort(Collections.reverseOrder());
-            comboList.add(list);
-        });
+        generateCombinations(comboList, keys, combos, 0, keys.length-1, 0, size);
         comboList.sort((x, y) -> {
             for (int i = 0; i < Math.max(x.size(), y.size()); i++) {
                 if (!Objects.equals(x.get(i), y.get(i))) {
@@ -69,6 +66,22 @@ public class WalletService implements IWalletService {
             return y.size() - x.size();
         });
         return comboList;
+    }
+
+    private void generateCombinations(List<List<Integer>> comboList, int[] keys, int[] combos, int start, int end, int index, int size) {
+        if (index == size) {
+            List<Integer> list = new ArrayList<>();
+            for (int j=0; j<size; j++) {
+                list.add(combos[j]);
+            }
+            list.sort(Collections.reverseOrder());
+            comboList.add(list);
+            return;
+        }
+        for (int i=start; i<=end && end-i+1 >= size-index; i++) {
+            combos[index] = keys[i];
+            generateCombinations(comboList, keys, combos, i+1, end, index+1, size);
+        }
     }
 
     private void verifyCombination(List<List<Integer>> comboList, int txnAmount) {
